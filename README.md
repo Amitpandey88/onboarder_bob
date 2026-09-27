@@ -19,6 +19,15 @@ The First PR view analyzes repository files locally through Onboarder's guarded 
 
 Run `npm test` to verify the existing app and the new First PR analysis. The original Onboarder source is available at [Amitpandey88/onboarder](https://github.com/Amitpandey88/onboarder).
 
+### Demo and submission media
+
+- [Narrated 95-second product demo](assets/onboarder-bob-demo.mp4)
+- [Six-slide pitch deck](assets/Onboarder-Bob-pitch.pdf)
+- [IBM Bob Shell task session summary export](assets/bob-task-session.png)
+- [First PR view](assets/first-pr-in-onboarder.png) and [IBM Bob refinement result](assets/ibm-bob-refinement.png)
+
+![The original Onboarder interface with its new First PR view](assets/first-pr-in-onboarder.png)
+
 ---
 
 ## Original Onboarder documentation
