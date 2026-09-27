@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Onboarder — a map for any codebase</title>
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f7f4ed'/%3E%3Ccircle cx='9' cy='16' r='4' fill='none' stroke='%232a2721' stroke-width='2'/%3E%3Ccircle cx='24' cy='8' r='3.2' fill='none' stroke='%232e5d43' stroke-width='2'/%3E%3Ccircle cx='24' cy='24' r='3.2' fill='none' stroke='%232a2721' stroke-width='2'/%3E%3Cpath d='M13 14 L21 9 M13 18 L21 23' stroke='%232a2721' stroke-width='1.6'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">onboarder</span>
+    <span class="brand-note" id="brandNote">a map for any codebase</span>
+  </div>
+  <nav class="views" id="viewTabs" hidden>
+    <button class="view-tab is-active" data-view="explorer">Explorer</button>
+    <button class="view-tab" data-view="analysis">Deep Analysis</button>
+    <button class="view-tab" data-view="graph">Graph</button>
+    <button class="view-tab" data-view="heatmap">Heatmap</button>
+    <button class="view-tab" data-view="insights">Insights</button>
+    <button class="view-tab" data-view="diff">Diff</button>
+    <button class="view-tab" data-view="workflows">Workflows</button>
+    <button class="view-tab" data-view="sbom">SBOM</button>
+    <button class="view-tab" data-view="code">Code</button>
+    <button class="view-tab" data-view="docs">Docs</button>
+    <button class="view-tab" data-view="about">About</button>
+    <button class="view-tab" data-view="firstpr">First PR</button>
+  </nav>
+  <div class="topbar-right">
+    <button class="btn btn-ghost btn-search-trigger" id="searchTriggerBtn" title="Search files, symbols and contents — ext:, path:, is:test, &quot;phrases&quot;, /regex/ (Cmd+K / Ctrl+K)" hidden>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px;"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span class="search-trigger-label">Search</span><span class="search-key-hint">⌘K</span>
+    </button>
+    <span class="repo-chip" id="repoChip" hidden></span>
+    <button class="btn btn-ghost" id="mcpBtn" title="Expose this repository to any AI agent through the Model Context Protocol">
+      <span class="mcp-dot" id="mcpDot" aria-hidden="true"></span><span id="mcpBtnLabel">MCP</span>
+    </button>
+    <button class="btn btn-ghost" id="themeBtn" title="Switch theme">Dark</button>
+    <button class="btn btn-ghost" id="newRepoBtn" hidden>New repo</button>
+    <button class="btn btn-ghost" id="settingsBtn">API key</button>
+    <button class="btn btn-ghost" id="serverBtn" title="Server mode, network, access key, and tunnels">Server</button>
+    <span class="me-links" title="Built by Amit Pandey">
+      <a class="me-link" href="https://github.com/Amitpandey88" target="_blank" rel="noopener" title="Amit on GitHub" aria-label="Amit Pandey on GitHub">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </a>
+      <a class="me-link" href="https://theamit.me" target="_blank" rel="noopener" title="theamit.me — portfolio" aria-label="Amit Pandey's portfolio">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9z"/></svg>
+      </a>
+    </span>
+  </div>
+</header>
+
+<!-- ============================ LANDING ============================ -->
+<main class="landing" id="landing">
+  <div class="landing-inner">
+    <h1 class="landing-title">Drop a path.<br>Get a map.</h1>
+    <p class="landing-sub">
+      Onboarder reads a repository the way a new teammate would — starting at the
+      front door, following the imports, noting who depends on whom — then draws
+      the whole thing as flow diagrams you can actually navigate.
+    </p>
+
+    <div class="load-grid">
+      <section class="load-card">
+        <h2 class="load-card-title">A folder on this machine</h2>
+        <p class="load-card-note">The server reads it in place. Nothing is copied.</p>
+        <form id="pathForm" class="load-form">
+          <input type="text" id="pathInput" class="text-input" placeholder="~/work/some-repo"
+                 spellcheck="false" autocomplete="off">
+          <button type="submit" class="btn btn-ink">Scan it</button>
+        </form>
+      </section>
+
+      <section class="load-card">
+        <h2 class="load-card-title">A git URL</h2>
+        <p class="load-card-note">Shallow-cloned to a temp folder, removed when you’re done.</p>
+        <form id="gitForm" class="load-form">
+          <input type="url" id="gitInput" class="text-input" placeholder="https://github.com/…"
+                 spellcheck="false" autocomplete="off">
+          <button type="submit" class="btn btn-ink">Clone &amp; scan</button>
+        </form>
+      </section>
+
+      <section class="load-card" id="pickCard">
+        <h2 class="load-card-title">Pick it in the browser</h2>
+        <p class="load-card-note">Your files never leave this tab. Chromium browsers only.</p>
+        <button class="btn btn-outline" id="pickBtn">Choose a folder…</button>
+      </section>
+    </div>
+
+    <p class="landing-alt">
+      Just looking? <button class="linklike" id="demoBtn">Scan this app’s own source</button> and see what it makes of itself.
+    </p>
+
+    <section class="landing-about" id="landingAbout">
+      <div class="la-actions">
+        <button class="la-hide" id="creditsHide" title="Hide this card">hide</button>
+        <button class="la-hide la-remove" id="creditsRemove" title="Permanently remove">remove</button>
+      </div>
+      <div class="la-col">
+        <div class="la-name">onboarder</div>
+        <p class="la-note">a map for any codebase — runs locally, follows the imports, draws the flow.</p>
+        <div class="about-tool-links">
+          <a class="tool-link" href="https://onboarder.theamit.me" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2.2 5-5 2.2 2.2-5z" fill="currentColor" stroke="none"/></svg>
+            onboarder.theamit.me
+          </a>
+        </div>
+      </div>
+      <div class="la-rule" aria-hidden="true"></div>
+      <div class="la-col">
+        <div class="la-name">Amit Pandey</div>
+        <p class="la-role">AI, Data &amp; Software Engineer · Computer &amp; Data Science student · India</p>
+        <p class="la-note">Carving a path at the intersection of artificial intelligence, data engineering,
+          and software development — training models, wrangling datasets, shipping clean code.</p>
+        <div class="about-tool-links">
+          <a class="tool-link" href="https://theamit.me" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9z"/></svg>
+            theamit.me
+          </a>
+          <a class="tool-link" href="https://theamit.me/projects.html" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            projects
+          </a>
+          <a class="tool-link" href="https://theamit.me/blog/index.html" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+            blog
+          </a>
+          <a class="tool-link" href="https://github.com/Amitpandey88" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+            Amitpandey88
+          </a>
+          <a class="tool-link" href="https://www.linkedin.com/in/theamitpandey" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            theamitpandey
+          </a>
+          <a class="tool-link" href="mailto:hello@theamit.me">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+            hello@theamit.me
+          </a>
+        </div>
+      </div>
+    </section>
+    <p class="credits-bar" id="creditsBar" hidden>
+      <button class="btn credits-show" id="creditsShow">about the tool &amp; the maker</button>
+      <button class="btn btn-ghost credits-bar-remove" id="creditsBarRemove" title="Permanently remove">remove</button>
+    </p>
+
+    <p class="landing-error" id="landingError" hidden></p>
+    <p class="landing-status" id="landingStatus" hidden></p>
+  </div>
+  <footer class="landing-foot" id="landingFoot">
+    <span>Everything runs locally.</span>
+    <span>Diagrams export as Mermaid or SVG.</span>
+    <span>Explanations optional — bring any OpenAI-compatible key.</span>
+    <span class="foot-license" id="footCredit">MIT licensed · created by <a href="https://theamit.me" target="_blank" rel="noopener">Amit</a></span>
+  </footer>
+</main>
+<!-- ============================ EXPLORER ============================ -->
+<main class="explorer" id="explorer" hidden>
+  <button class="mobile-panel-scrim" id="mobilePanelScrim" type="button" aria-label="Close panel" hidden></button>
+  <aside class="sidebar" id="fileSidebar" tabindex="-1">
+    <div class="mobile-panel-top"><strong>Files</strong><button class="btn btn-ghost" id="mobileFilesClose" type="button">Close</button></div>
+    <div class="sidebar-head">
+      <input type="search" id="treeFilter" class="tree-filter" placeholder="Filter files…" spellcheck="false">
+    </div>
+    <div class="tree" id="fileTree"></div>
+  </aside>
+
+  <section class="stage">
+    <div class="stage-head">
+      <div class="mobile-panel-buttons">
+        <button class="btn btn-outline" id="mobileFilesBtn" type="button" aria-controls="fileTree" aria-expanded="false">Files</button>
+        <button class="btn btn-outline" id="mobileDetailsBtn" type="button" aria-controls="inspector" aria-expanded="false">Details</button>
+      </div>
+      <div class="crumbs" id="crumbs"></div>
+      <div class="stage-actions">
+        <button class="btn btn-ghost btn-sm" id="mmToggleBtn" hidden>Open folders</button>
+        <button class="btn btn-ghost btn-sm" id="aiDrawBtn">AI draft</button>
+        <button class="btn btn-ghost btn-sm" id="copyMermaidBtn">Copy Mermaid</button>
+        <button class="btn btn-ghost btn-sm" id="svgBtn">Save SVG</button>
+        <button class="btn btn-ghost btn-sm" id="fitBtn">Fit</button>
+      </div>
+    </div>
+    <div class="stage-filters" id="stageFilters" hidden>
+      <div class="mode-switch" id="modeSwitch">
+        <button class="mode-chip is-active" data-mode="map">Tree</button>
+        <button class="mode-chip" data-mode="files">Files</button>
+        <button class="mode-chip" data-mode="patterns">Layers</button>
+        <button class="mode-chip" data-mode="health">Health</button>
+        <button class="mode-chip" data-mode="security">Security</button>
+        <button class="mode-chip" data-mode="history">History</button>
+        <button class="mode-chip" data-mode="services">Services</button>
+        <button class="mode-chip" data-mode="tour">Tour</button>
+        <button class="mode-chip" data-mode="atlas">Atlas</button>
+      </div>
+      <input type="search" id="nodeFilter" class="node-filter" placeholder="Filter nodes…" spellcheck="false" autocomplete="off">
+      <button class="chip-toggle is-on" id="testsToggle" title="Show or hide test files">tests</button>
+      <select id="depthSelect" class="depth-select" title="How deep the tree opens by itself">
+        <option value="0">manual depth</option>
+        <option value="1">open depth 1</option>
+        <option value="2">open depth 2</option>
+        <option value="3">open depth 3</option>
+      </select>
+    </div>
+    <div class="docview" id="docView" hidden></div>
+    <div class="docview" id="aboutView" hidden></div>
+    <div class="docview" id="insightsView" hidden></div>
+    <div class="docview" id="diffView" hidden></div>
+    <div class="docview" id="workflowsView" hidden></div>
+    <div class="docview" id="sbomView" hidden></div>
+    <div class="docview" id="analysisView" hidden></div>
+    <div class="docview firstpr-view" id="firstPrView" hidden></div>
+    <div class="code-tab-container" id="codeTabContainer" hidden>
+      <div class="blame-gutter" id="blameGutter" hidden></div>
+      <div class="docview code-docview" id="codeView"></div>
+    </div>
+    <section class="graph-view" id="graphView" hidden style="flex:1; position:relative;">
+      <canvas class="graph-canvas" id="graphCanvas"></canvas>
+      <div class="graph-controls" id="graphControls">
+        <input type="search" class="graph-search-input" id="graphSearchInput" placeholder="Filter graph nodes…" style="font-family:var(--mono);font-size:11px;padding:4px 8px;border:1.5px solid var(--ink);border-radius:4px;background:var(--card);color:var(--ink);width:130px;" />
+        <button class="btn btn-ghost" id="graphReset" title="Reset layout">Reset</button>
+        <button class="btn btn-ghost" id="graphZoomIn" title="Zoom in">+</button>
+        <button class="btn btn-ghost" id="graphZoomOut" title="Zoom out">−</button>
+        <button class="btn btn-ghost" id="graphFit" title="Fit graph to screen">Fit</button>
+      </div>
+      <div class="graph-tooltip" id="graphTooltip" hidden></div>
+    </section>
+    <section class="heatmap-view" id="heatmapView" hidden style="flex:1; position:relative;">
+      <canvas class="heatmap-canvas" id="heatmapCanvas"></canvas>
+      <div class="heatmap-tooltip" id="heatmapTooltip" hidden></div>
+    </section>
+    <div class="canvas" id="canvas">
+      <div class="canvas-content" id="canvasContent"></div>
+      <div class="canvas-empty" id="canvasEmpty" hidden></div>
+    </div>
+    <div class="stage-foot" id="stageFoot"></div>
+  </section>
+
+  <aside class="inspector" id="inspector" tabindex="-1">
+    <div class="mobile-panel-top"><strong>Details</strong><button class="btn btn-ghost" id="mobileDetailsClose" type="button">Close</button></div>
+    <div class="inspector-empty" id="inspectorEmpty">
+      <p class="inspector-empty-line">Click anything on the map<br>to read its mail.</p>
+    </div>
+    <div class="inspector-body" id="inspectorBody" hidden>
+      <header class="inspector-head">
+        <h2 class="inspector-title" id="inspTitle"></h2>
+        <span class="role-chip" id="inspRole"></span>
+        <button class="insp-back" id="inspBack" hidden></button>
+      </header>
+      <p class="inspector-path" id="inspPath"></p>
+      <div class="inspector-stats" id="inspStats"></div>
+      <section class="inspector-section">
+        <h3 class="inspector-h">What it does · ask the AI</h3>
+        <div class="explain" id="inspExplain"></div>
+        <div class="ask-row">
+          <input type="text" id="askInput" class="text-input ask-input"
+                 placeholder="Ask anything about this repo…" spellcheck="false" autocomplete="off">
+          <button class="btn btn-ink btn-sm" id="askBtn">Ask</button>
+        </div>
+        <button class="linklike ask-auto" id="aiExplainBtn">no question — just explain this file →</button>
+      </section>
+      <section class="inspector-section" id="inspSecurityTools"></section>
+      <section class="inspector-section" id="inspLists"></section>
+    </div>
+  </aside>
+</main>
+
+<!-- ============================ TOUR ============================ -->
+<div class="tourbar" id="tourbar" hidden>
+  <div class="tourbar-info">
+    <span class="tourbar-kicker">The guided walk</span>
+    <span class="tourbar-title" id="tourTitle"></span>
+  </div>
+  <div class="tourbar-controls">
+    <button class="btn btn-ghost btn-sm" id="tourPrev">← Prev</button>
+    <span class="tourbar-count" id="tourCount"></span>
+    <button class="btn btn-ghost btn-sm" id="tourNext">Next →</button>
+    <button class="btn btn-ghost btn-sm" id="tourExit">Leave the tour</button>
+  </div>
+</div>
+
+<!-- ============================ SETTINGS ============================ -->
+<div class="drawer-scrim" id="drawerScrim" hidden></div>
+<aside class="drawer" id="settingsDrawer" hidden>
+  <header class="drawer-head">
+    <h2>Explain with AI</h2>
+    <button class="btn btn-ghost btn-sm" id="drawerClose">Close</button>
+  </header>
+  <p class="drawer-note">
+    Nothing is preconfigured — no endpoint, model, or key ships with the repo.
+    Point this at any OpenAI-compatible endpoint (OpenAI proper, Groq,
+    OpenRouter, Ollama, LM Studio…). Without one you still get the offline notes.
+  </p>
+  <label class="field">
+    <span class="field-label">Base URL</span>
+    <input type="text" id="setBaseUrl" class="text-input" placeholder="https://api.openai.com/v1" spellcheck="false">
+  </label>
+  <label class="field">
+    <span class="field-label">API key</span>
+    <input type="password" id="setApiKey" class="text-input" placeholder="sk-… or leave empty for local servers">
+  </label>
+  <label class="field">
+    <span class="field-label">Model</span>
+    <input type="text" id="setModel" class="text-input" placeholder="gpt-4o-mini" spellcheck="false">
+  </label>
+  <div class="drawer-actions">
+    <button class="btn btn-ink" id="saveSettings">Save</button>
+    <button class="btn btn-outline" id="testSettings">Test connection</button>
+  </div>
+  <p class="drawer-status" id="settingsStatus"></p>
+  <p class="drawer-fine">
+    Stored in this browser’s localStorage, forwarded through your local server,
+    never written to disk or logged. Close the tab and it stays here; clear site
+    data and it’s gone.
+  </p>
+</aside>
+
+<div class="search-overlay" id="searchOverlay" hidden></div>
+
+<!-- ============================ MCP ============================ -->
+<!--
+  Its own drawer rather than a tab inside the settings one, for one reason: the
+  settings drawer is about this browser talking to an LLM with a key, and MCP is
+  about other programs talking to Onboarder with no key at all. They share a
+  shape, not a subject.
+-->
+<div class="drawer-scrim" id="mcpScrim" hidden></div>
+<aside class="drawer" id="mcpDrawer" hidden>
+  <header class="drawer-head">
+    <h2>MCP server</h2>
+    <button class="btn btn-ghost btn-sm" id="mcpClose">Close</button>
+  </header>
+  <p class="drawer-note">
+    Runs Onboarder as a Model Context Protocol server, so any AI agent or harness
+    on this machine can ask it about a repository — its structure, architecture,
+    health, security, history, and every file in it — by talking to it. The server
+    reads repositories and never writes to them.
+  </p>
+
+  <div class="mcp-state" id="mcpStateRow">
+    <span class="mcp-dot mcp-dot-lg" id="mcpPanelDot" aria-hidden="true"></span>
+    <span class="mcp-state-text" id="mcpPanelState">Checking…</span>
+  </div>
+
+  <div class="drawer-actions">
+    <button class="btn btn-ink" id="mcpStart">Start server</button>
+    <button class="btn btn-outline" id="mcpStop" disabled>Stop</button>
+  </div>
+  <p class="drawer-status" id="mcpStatus"></p>
+
+  <div class="mcp-config" id="mcpConfig" hidden>
+    <span class="field-label">Configure your agent with</span>
+    <div class="mcp-config-row">
+      <input type="text" class="text-input mcp-config-input" id="mcpCommandInput" readonly spellcheck="false">
+      <button class="btn btn-ghost btn-sm" id="mcpCopy" title="Copy this command">Copy</button>
+    </div>
+    <div class="mcp-tabs" role="tablist" aria-label="Configuration format">
+      <button class="mcp-tab is-on" id="mcpTabJson" role="tab" aria-selected="true">JSON</button>
+      <button class="mcp-tab" id="mcpTabToml" role="tab" aria-selected="false">TOML</button>
+    </div>
+    <pre class="mcp-config-block" id="mcpConfigBlock"></pre>
+    <p class="drawer-fine" id="mcpToolsHint"></p>
+  </div>
+</aside>
+
+<!-- ============================ SERVER ============================ -->
+<!--
+  The third drawer: this browser talking to the Onboarder server itself. The AI
+  drawer holds an LLM key; this one holds the server's own mode, bind, domain,
+  and access key, and the tunnel switches. Everything here lands in the same
+  config file the CLI wizard writes — one file, three editors.
+-->
+<div class="drawer-scrim" id="serverScrim" hidden></div>
+<aside class="drawer" id="serverDrawer" hidden>
+  <header class="drawer-head">
+    <h2>Server</h2>
+    <button class="btn btn-ghost btn-sm" id="serverClose">Close</button>
+  </header>
+  <p class="drawer-note" id="serverModeNote"></p>
+
+  <label class="field">
+    <span class="field-label">Mode</span>
+    <select id="srvMode" class="text-input">
+      <option value="local">Local — this machine only, no key</option>
+      <option value="self-hosted">Self-hosted — reachable, key required</option>
+    </select>
+  </label>
+  <div class="server-grid">
+    <label class="field">
+      <span class="field-label">Bind host</span>
+      <input type="text" id="srvHost" class="text-input" placeholder="127.0.0.1" spellcheck="false">
+    </label>
+    <label class="field">
+      <span class="field-label">Port</span>
+      <input type="number" id="srvPort" class="text-input" min="1" max="65535" placeholder="4310">
+    </label>
+  </div>
+  <label class="field" id="srvDomainField">
+    <span class="field-label">Domain (optional for direct IP or a tunnel)</span>
+    <input type="text" id="srvDomain" class="text-input" placeholder="map.example.com" spellcheck="false">
+  </label>
+  <div id="srvHttpsField" hidden>
+    <label class="check-row">
+      <input type="checkbox" id="srvHttps">
+      <span>Automatic HTTPS with Caddy</span>
+    </label>
+    <p class="drawer-fine" id="srvHttpsStatus"></p>
+  </div>
+  <label class="check-row">
+    <input type="checkbox" id="srvAutoOpen">
+    <span>Open the browser when the server starts</span>
+  </label>
+
+  <div class="server-section" id="srvKeySection" hidden>
+    <span class="field-label">Access key</span>
+    <div class="mcp-config-row">
+      <input type="text" class="text-input mcp-config-input" id="srvKeyMasked" readonly spellcheck="false">
+      <button class="btn btn-ghost btn-sm" id="srvRotate" title="Mint a new key; the old one dies immediately">Rotate</button>
+    </div>
+    <div class="server-fresh-key" id="srvFreshKeyRow" hidden>
+      <p class="drawer-fine">New key — shown once. This browser has been signed in with it:</p>
+      <div class="mcp-config-row">
+        <input type="text" class="text-input mcp-config-input" id="srvFreshKey" readonly spellcheck="false">
+        <button class="btn btn-ghost btn-sm" id="srvCopyKey">Copy</button>
+      </div>
+    </div>
+    <p class="drawer-fine" id="srvKeyHint"></p>
+    <button class="btn btn-ghost btn-sm" id="srvLogout">Sign out this browser</button>
+  </div>
+
+  <div class="server-section">
+    <span class="field-label">Profile</span>
+    <div class="server-grid">
+      <input type="text" id="srvName" class="text-input" placeholder="Your name" spellcheck="false">
+      <input type="email" id="srvEmail" class="text-input" placeholder="you@example.com" spellcheck="false">
+    </div>
+  </div>
+
+  <div class="server-section">
+    <span class="field-label">Tunnels</span>
+    <label class="check-row">
+      <input type="checkbox" id="srvTunnelCloudflare">
+      <span>Cloudflare quick tunnel</span>
+    </label>
+    <p class="drawer-fine" id="srvTunnelCloudflareStatus"></p>
+    <label class="check-row">
+      <input type="checkbox" id="srvTunnelTailscale">
+      <span>Tailscale</span>
+    </label>
+    <p class="drawer-fine" id="srvTunnelTailscaleStatus"></p>
+  </div>
+
+  <div class="drawer-actions">
+    <button class="btn btn-ink" id="srvSave">Save</button>
+  </div>
+  <p class="drawer-status" id="srvStatus"></p>
+  <p class="drawer-fine" id="srvConfigPath"></p>
+</aside>
+
+<div class="toast" id="toast" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="/vendor/monaco/vs/loader.js"></script>
+<script src="/vendor/mermaid.min.js"></script>
+<script type="module" src="/js/components/RiskBadge.js"></script>
+<script type="module" src="/js/components/MetricSparkline.js"></script>
+<script type="module" src="/js/components/FileChip.js"></script>
+<script type="module" src="/app.js"></script>
+</body>
+</html>

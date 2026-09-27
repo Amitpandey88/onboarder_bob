@@ -1,0 +1,32 @@
+name: Onboarder CI & Test Suite
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Test Suite
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run Built-in Unit Tests
+        run: npm test
+
+  security-audit:
+    name: Security & License Audit
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Verify zero runtime dependencies
+        run: node -e "const pkg = JSON.parse(require('fs').readFileSync('package.json')); if (pkg.dependencies && Object.keys(pkg.dependencies).length > 0) throw new Error('Runtime dependencies detected!');"

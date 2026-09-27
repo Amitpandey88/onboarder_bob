@@ -1,0 +1,17 @@
+
+node_modules/
+*.log
+.DS_Store
+dist/
+.fuse*
+*.fuse*
+*.zip
+
+# Internal documentation
+Agent.md
+agent.md
+IMPROVEMENTS.md
+plan.md
+
+# playwright-cli browser session artifacts
+.playwright-cli/

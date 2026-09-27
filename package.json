@@ -1,0 +1,54 @@
+{
+  "name": "onboarder-bob-hackathon",
+  "version": "0.6.0",
+  "description": "Onboarder with evidence-backed First PR briefs and IBM Bob refinement for the IBM Bob 2.0 Hackathon.",
+  "type": "module",
+  "bin": {
+    "onboarder": "bin/onboarder.js",
+    "codebase-onboarder": "bin/onboarder.js"
+  },
+  "files": [
+    "bin",
+    "cli",
+    "server",
+    "shared",
+    "public",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.cli.json && tsc -p tsconfig.web.json",
+    "typecheck": "tsc -p tsconfig.cli.json --noEmit && tsc -p tsconfig.web.json --noEmit",
+    "start": "node server/index.js",
+    "mcp": "node server/mcp/standalone.js",
+    "test": "npm run build && node --test",
+    "postinstall": "node bin/postinstall.js",
+    "prepublishOnly": "npm test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "codebase",
+    "visualization",
+    "architecture",
+    "onboarding",
+    "diagram",
+    "mermaid",
+    "mcp",
+    "self-hosted",
+    "developer-tools"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Amitpandey88/onboarder_bob.git"
+  },
+  "homepage": "https://github.com/Amitpandey88/onboarder_bob#readme",
+  "bugs": "https://github.com/Amitpandey88/onboarder_bob/issues",
+  "author": "Amit Pandey",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "typescript": "^7.0.2"
+  }
+}
