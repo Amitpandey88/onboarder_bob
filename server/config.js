@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS = Object.freeze({
   host: '127.0.0.1',
   port: 4310,
   domain: '',
+  domains: Object.freeze([]),
   // When a domain is configured, ask Caddy to obtain and renew a trusted TLS
   // certificate and reverse-proxy this app. The certificate itself belongs to
   // Caddy; the server still speaks plain HTTP to its local upstream.
@@ -80,12 +81,16 @@ function normalizeTunnel(value = {}) {
 export function normalizeSettings(value = {}) {
   const mode = value.mode === 'self-hosted' ? 'self-hosted' : 'local';
   const host = cleanString(value.host || DEFAULT_SETTINGS.host, 120);
+  const domains = Array.isArray(value.domains)
+    ? value.domains.map(normalizeDomain).filter(Boolean)
+    : [];
   const settings = {
     version: CONFIG_VERSION,
     mode,
     host,
     port: normalizePort(value.port ?? DEFAULT_SETTINGS.port),
     domain: normalizeDomain(value.domain),
+    domains,
     https: Boolean(value.https),
     accessKey: cleanString(value.accessKey, 256),
     autoOpen: value.autoOpen === undefined ? DEFAULT_SETTINGS.autoOpen : Boolean(value.autoOpen),
@@ -186,6 +191,9 @@ export function allowedHosts(value = DEFAULT_SETTINGS) {
   const settings = normalizeSettings(value);
   const hosts = new Set();
   if (settings.domain) hosts.add(settings.domain);
+  if (Array.isArray(settings.domains)) {
+    for (const d of settings.domains) hosts.add(d);
+  }
   if (!isLoopbackHost(settings.host)) {
     // A wildcard bind is useful as a literal Host value to diagnostics, even
     // though browsers normally address the machine by one of its real IPs.
